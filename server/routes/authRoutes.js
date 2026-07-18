@@ -6,10 +6,18 @@ const {
   login,
 } = require("../controllers/authController");
 
-console.log("register:", typeof register);
-console.log("login:", typeof login);
+const { protect } = require("../middleware/authMiddleware");
 
+// Public Routes
 router.post("/register", register);
 router.post("/login", login);
+
+// Protected Route
+router.get("/me", protect, (req, res) => {
+  res.status(200).json({
+    success: true,
+    user: req.user,
+  });
+});
 
 module.exports = router;

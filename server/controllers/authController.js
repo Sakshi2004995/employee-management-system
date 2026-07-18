@@ -8,7 +8,6 @@ exports.register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    // Validate input
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -16,7 +15,6 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -26,7 +24,6 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Create user
     const user = await User.create({
       name,
       email,
@@ -34,10 +31,8 @@ exports.register = async (req, res) => {
       role,
     });
 
-    // Generate JWT Token
     const token = generateToken(user._id);
 
-    // Hide password before sending response
     user.password = undefined;
 
     res.status(201).json({
@@ -61,8 +56,51 @@ exports.register = async (req, res) => {
 // Login User
 // ===============================
 exports.login = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Login API coming in Day 2 🚀",
-  });
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide email and password",
+      });
+    }
+
+    const user = await User.findOne({ email }).select("+password");
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    const isMatch = await user.comparePassword(password);
+
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    const token = generateToken(user._id);
+
+    user.password = undefined;
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token,
+      user,
+    });
+
+  } catch (error) {
+    console.error("Login Error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };

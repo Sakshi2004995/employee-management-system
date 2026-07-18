@@ -1,3 +1,4 @@
+const employeeRoutes = require("./routes/employeeRoutes");
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -28,7 +29,9 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Routes
-console.log(authRoutes);
+
+// Employee Routes
+app.use("/api/employees", employeeRoutes);
 app.use("/api/auth", authRoutes);
 
 // Test Route

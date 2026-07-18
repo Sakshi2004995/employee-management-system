@@ -7,6 +7,7 @@ const {
   getEmployeeById,
   updateEmployee,
   deleteEmployee,
+  getDashboardStats,
 } = require("../controllers/employeeController");
 
 const { protect } = require("../middleware/authMiddleware");
@@ -32,6 +33,18 @@ router.get(
   protect,
   authorize("SUPER_ADMIN", "HR", "MANAGER"),
   getAllEmployees
+);
+
+// ===============================
+// Dashboard Statistics
+// SUPER_ADMIN, HR and MANAGER
+// IMPORTANT: Keep this route above "/:id"
+// ===============================
+router.get(
+  "/dashboard/stats",
+  protect,
+  authorize("SUPER_ADMIN", "HR", "MANAGER"),
+  getDashboardStats
 );
 
 // ===============================

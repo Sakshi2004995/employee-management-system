@@ -230,3 +230,59 @@ exports.deleteEmployee = async (req, res) => {
     });
   }
 };
+// ===============================
+// Dashboard Statistics
+// ===============================
+exports.getDashboardStats = async (req, res) => {
+  try {
+    const totalEmployees = await Employee.countDocuments();
+
+    const activeEmployees = await Employee.countDocuments({
+      status: "ACTIVE",
+    });
+
+    const inactiveEmployees = await Employee.countDocuments({
+      status: "INACTIVE",
+    });
+
+    const departments = await Employee.distinct("department");
+
+    const salaryStats = await Employee.aggregate([
+      {
+        $group: {
+          _id: null,
+          averageSalary: { $avg: "$salary" },
+        },
+      },
+    ]);
+
+    const averageSalary =
+      salaryStats.length > 0
+        ? Math.round(salaryStats[0].averageSalary)
+        : 0;
+
+    const recentEmployees = await Employee.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select("employeeId firstName lastName department salary status");
+
+    res.status(200).json({
+      success: true,
+      stats: {
+        totalEmployees,
+        activeEmployees,
+        inactiveEmployees,
+        totalDepartments: departments.length,
+        averageSalary,
+        recentEmployees,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

@@ -1,3 +1,4 @@
+console.log("EMPLOYEE ROUTES LOADED");
 const express = require("express");
 const router = express.Router();
 
@@ -12,6 +13,7 @@ const {
 
 const { protect } = require("../middleware/authMiddleware");
 const { authorize } = require("../middleware/roleMiddleware");
+const upload = require("../middleware/uploadMiddleware");
 
 // ===============================
 // Create Employee
@@ -37,8 +39,6 @@ router.get(
 
 // ===============================
 // Dashboard Statistics
-// SUPER_ADMIN, HR and MANAGER
-// IMPORTANT: Keep this route above "/:id"
 // ===============================
 router.get(
   "/dashboard/stats",
@@ -49,7 +49,6 @@ router.get(
 
 // ===============================
 // Get Employee By ID
-// SUPER_ADMIN, HR and MANAGER
 // ===============================
 router.get(
   "/:id",
@@ -60,18 +59,33 @@ router.get(
 
 // ===============================
 // Update Employee
-// Only SUPER_ADMIN and HR
 // ===============================
 router.put(
   "/:id",
+
   protect,
+
   authorize("SUPER_ADMIN", "HR"),
+
+  (req, res, next) => {
+    console.log("========== BEFORE MULTER ==========");
+    next();
+  },
+
+  upload.single("profileImage"),
+
+  (req, res, next) => {
+    console.log("========== AFTER MULTER ==========");
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
+    next();
+  },
+
   updateEmployee
 );
 
 // ===============================
 // Delete Employee
-// Only SUPER_ADMIN
 // ===============================
 router.delete(
   "/:id",

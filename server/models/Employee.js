@@ -6,6 +6,7 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      trim: true,
     },
 
     firstName: {
@@ -31,6 +32,7 @@ const employeeSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: true,
+      trim: true,
     },
 
     gender: {
@@ -42,16 +44,19 @@ const employeeSchema = new mongoose.Schema(
     department: {
       type: String,
       required: true,
+      trim: true,
     },
 
     designation: {
       type: String,
       required: true,
+      trim: true,
     },
 
     salary: {
       type: Number,
       required: true,
+      min: 0,
     },
 
     joiningDate: {
@@ -67,10 +72,14 @@ const employeeSchema = new mongoose.Schema(
 
     address: {
       type: String,
+      default: "",
+      trim: true,
     },
 
     emergencyContact: {
       type: String,
+      default: "",
+      trim: true,
     },
 
     profileImage: {
@@ -81,6 +90,7 @@ const employeeSchema = new mongoose.Schema(
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
   },
   {

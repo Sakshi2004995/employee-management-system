@@ -1,4 +1,10 @@
 const Employee = require("../models/Employee");
+console.log("EMPLOYEE CONTROLLER LOADED");
+console.log(require.resolve("../models/Employee"));
+
+console.log("Employee Model:", Employee);
+console.log("findById:", typeof Employee.findById);
+console.log("findByIdAndUpdate:", typeof Employee.findByIdAndUpdate);
 
 // ===============================
 // Create Employee
@@ -168,16 +174,16 @@ exports.getEmployeeById = async (req, res) => {
 // ===============================
 // Update Employee
 // ===============================
+// ===============================
+// Update Employee
+// ===============================
 exports.updateEmployee = async (req, res) => {
+  console.log("========== UPDATE REQUEST ==========");
+  console.log("BODY:", req.body);
+  console.log("FILE:", req.file);
+
   try {
-    const employee = await Employee.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const employee = await Employee.findById(req.params.id);
 
     if (!employee) {
       return res.status(404).json({
@@ -185,6 +191,14 @@ exports.updateEmployee = async (req, res) => {
         message: "Employee not found",
       });
     }
+
+    Object.assign(employee, req.body);
+
+    if (req.file) {
+      employee.profileImage = `/uploads/profiles/${req.file.filename}`;
+    }
+
+    await employee.save();
 
     res.status(200).json({
       success: true,
